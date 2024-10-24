@@ -1,4 +1,8 @@
-package qlpk.entity;
+package qlpk.view;
+
+import qlpk.app.Main;
+import qlpk.entity.Patient;
+import qlpk.entity.PatientManager;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -6,21 +10,18 @@ import java.awt.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Main extends JFrame {
+public class PatientPanel extends JPanel {
+    private Main mainFrame;
     private PatientManager patientManager;
     private DefaultTableModel tableModel;
     private JTable table;
     private JTextField nameField, phoneField, doctorField, diseaseTypeField, clinicRoomField, timeField;
 
-    public Main() {
+    public PatientPanel(Main mainFrame) {
+        this.mainFrame = mainFrame;
         patientManager = new PatientManager();
-        setTitle("Patient Management");
-        setSize(1200, 800); 
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
-        setLayout(new BorderLayout()); 
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
-        
+        setLayout(new BorderLayout());
+
         // Tạo JPanel để chứa cả nút "Thoát" và tiêu đề
         JPanel topPanel = new JPanel(new BorderLayout());
 
@@ -39,10 +40,10 @@ public class Main extends JFrame {
         titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
         topPanel.add(titleLabel, BorderLayout.CENTER);
 
-        // Thêm topPanel vào vị trí BorderLayout.NORTH của JFrame
+        // Thêm topPanel vào vị trí BorderLayout.NORTH của JPanel
         add(topPanel, BorderLayout.NORTH);
 
-        // Cấu hình bảng dữ liệu
+        // Tạo bảng dữ liệu
         tableModel = new DefaultTableModel(new String[]{"ID", "Name", "Phone", "Doctor", "Disease Type", "Clinic Room", "Time"}, 0);
         table = new JTable(tableModel);
         loadTableData();
@@ -68,8 +69,7 @@ public class Main extends JFrame {
         searchByDiseaseTypeButton.addActionListener(e -> searchByDiseaseType());
         refreshButton.addActionListener(e -> loadTableData());
 
-        JPanel inputPanel = new JPanel();
-        inputPanel.setLayout(new GridBagLayout());
+        JPanel inputPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -78,37 +78,31 @@ public class Main extends JFrame {
         gbc.gridy = 0;
         inputPanel.add(new JLabel("Name:"), gbc);
         gbc.gridx = 1;
-        gbc.gridy = 0;
         inputPanel.add(nameField, gbc);
         gbc.gridx = 0;
         gbc.gridy = 1;
         inputPanel.add(new JLabel("Phone:"), gbc);
         gbc.gridx = 1;
-        gbc.gridy = 1;
         inputPanel.add(phoneField, gbc);
         gbc.gridx = 0;
         gbc.gridy = 2;
         inputPanel.add(new JLabel("Doctor:"), gbc);
         gbc.gridx = 1;
-        gbc.gridy = 2;
         inputPanel.add(doctorField, gbc);
         gbc.gridx = 0;
         gbc.gridy = 3;
         inputPanel.add(new JLabel("Disease Type:"), gbc);
         gbc.gridx = 1;
-        gbc.gridy = 3;
         inputPanel.add(diseaseTypeField, gbc);
         gbc.gridx = 0;
         gbc.gridy = 4;
         inputPanel.add(new JLabel("Clinic Room:"), gbc);
         gbc.gridx = 1;
-        gbc.gridy = 4;
         inputPanel.add(clinicRoomField, gbc);
         gbc.gridx = 0;
         gbc.gridy = 5;
         inputPanel.add(new JLabel("Time:"), gbc);
         gbc.gridx = 1;
-        gbc.gridy = 5;
         inputPanel.add(timeField, gbc);
 
         gbc.gridx = 0;
@@ -127,14 +121,7 @@ public class Main extends JFrame {
         add(new JScrollPane(table), BorderLayout.CENTER);
         add(inputPanel, BorderLayout.WEST);
     }
-    
-    // Method thoát về giao diện "Chào mừng"
-    private void exitToWelcomeScreen() {
-        this.setVisible(false); // Ẩn cửa sổ hiện tại
-        WelcomeScreen welcomeScreen = new WelcomeScreen(this); // Gọi giao diện chào mừng
-        welcomeScreen.setVisible(true); // Hiển thị giao diện chào mừng
-    }
-    
+
     private void loadTableData() {
         tableModel.setRowCount(0);
         for (Patient patient : patientManager.getPatients()) {
@@ -220,7 +207,6 @@ public class Main extends JFrame {
         timeField.setText("");
     }
 
-    // Method to search the table by Disease Type
     private void searchByDiseaseType() {
         String searchTerm = JOptionPane.showInputDialog(this, "Nhập tên bệnh cần tìm:");
         if (searchTerm == null || searchTerm.isEmpty()) {
@@ -250,44 +236,13 @@ public class Main extends JFrame {
         }
     }
 
-    private static boolean authenticateUser() {
-        String correctUsername = "admin";
-        String correctPassword = "admin";
+    private void exitToWelcomeScreen() {
+        // Đóng giao diện hiện tại
+        mainFrame.dispose();
 
-        String username = "";
-        char[] password;
-
-        while (true) {
-            username = JOptionPane.showInputDialog(null, "Nhập Username:");
-
-            JPasswordField passwordField = new JPasswordField();
-            int option = JOptionPane.showConfirmDialog(null, passwordField, "Nhập Password:", JOptionPane.OK_CANCEL_OPTION);
-
-            if (option == JOptionPane.OK_OPTION) {
-                password = passwordField.getPassword();
-            } else {
-                return false;
-            }
-
-            String passwordString = new String(password);
-
-            if (username.equals(correctUsername) && passwordString.equals(correctPassword)) {
-                JOptionPane.showMessageDialog(null, "Đăng nhập thành công!");
-                return true;
-            } else {
-                JOptionPane.showMessageDialog(null, "Sai tên hoặc mật khẩu.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        }
+        // Mở lại màn hình chào mừng
+        WelcomeScreen welcomeScreen = new WelcomeScreen(mainFrame);
+        welcomeScreen.setVisible(true);
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            if (authenticateUser()) {
-                Main mainFrame = new Main();
-                WelcomeScreen welcomeScreen = new WelcomeScreen(mainFrame);
-                welcomeScreen.setVisible(true); 
-                mainFrame.setVisible(false);
-            }
-        });
-    }
 }
