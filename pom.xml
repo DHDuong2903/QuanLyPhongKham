@@ -11,8 +11,8 @@
 
     <properties>  
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  
-        <maven.compiler.source>23</maven.compiler.source>  
-        <maven.compiler.target>23</maven.compiler.target>  
+        <maven.compiler.source>1.8</maven.compiler.source>  
+        <maven.compiler.target>1.8</maven.compiler.target>  
     </properties>  
 
     <dependencies>  
@@ -29,18 +29,77 @@
             <artifactId>jcalendar</artifactId>  
             <version>1.4</version> <!-- Kiểm tra phiên bản mới hơn nếu cần -->  
         </dependency>  
+
+        <!-- Thư viện JUnit 5 cho kiểm thử -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.8.1</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <!-- Thư viện JFreeChart cho biểu đồ -->
+        <dependency>
+            <groupId>org.jfree</groupId>
+            <artifactId>jfreechart</artifactId>
+            <version>1.5.3</version> <!-- Hoặc phiên bản mới nhất -->
+        </dependency>
+        
+        <!-- Thư viện JasperReports cho báo cáo -->
+        <dependency>
+            <groupId>net.sf.jasperreports</groupId>
+            <artifactId>jasperreports</artifactId>
+            <version>6.17.0</version> <!-- Phiên bản JasperReports bạn sử dụng -->
+        </dependency>
     </dependencies>  
 
     <build>  
         <plugins>  
+            <!-- Plugin tạo JAR với main class chỉ định -->
+            <plugin>  
+                <groupId>org.apache.maven.plugins</groupId>  
+                <artifactId>maven-jar-plugin</artifactId>  
+                <version>3.2.0</version>  
+                <configuration>  
+                    <archive>  
+                        <manifest>  
+                            <mainClass>qlpk.app.App</mainClass> <!-- Thay đổi thành lớp chính của bạn -->
+                        </manifest>  
+                    </archive>  
+                </configuration>  
+            </plugin>  
+
+            <!-- Plugin thực thi để chạy ứng dụng từ Maven -->
             <plugin>  
                 <groupId>org.codehaus.mojo</groupId>  
                 <artifactId>exec-maven-plugin</artifactId>  
                 <version>3.0.0</version>  
                 <configuration>  
-                    <mainClass>qlpk.Main</mainClass>   
+                    <mainClass>qlpk.app.App</mainClass> <!-- Thay đổi thành lớp chính của bạn -->
                 </configuration>  
             </plugin>  
+
+            <!-- Plugin để đóng gói các thư viện phụ thuộc vào JAR -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.4</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Plugin Surefire để chạy kiểm thử -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M5</version>
+            </plugin>
         </plugins>  
     </build>  
 </project>

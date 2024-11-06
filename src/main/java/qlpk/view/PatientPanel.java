@@ -5,6 +5,8 @@ import qlpk.entity.Patient;
 import qlpk.entity.PatientManager;
 import qlpk.entity.User;
 import qlpk.entity.UserManager;
+import qlpk.report.ReportGenerator;
+
 
 import com.toedter.calendar.JDateChooser;
 import javax.swing.*;
@@ -17,6 +19,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.stream.Collectors;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.chart.plot.PlotOrientation;
+import java.util.Map;  
+
 
 public class PatientPanel extends JPanel {
     private App mainFrame;
@@ -130,8 +139,10 @@ public class PatientPanel extends JPanel {
         JButton editButton = new JButton("Sửa");
         JButton deleteButton = new JButton("Xóa");
         JButton clearButton = new JButton("Xóa trường nhập");
-        JButton searchByDiseaseTypeButton = new JButton("Tìm theo tên bệnh");
-        JButton sortByTimeButton = new JButton("Sắp xếp theo thời gian");
+        JButton searchByDiseaseTypeButton = new JButton("Tìm tên bệnh");
+        JButton sortByTimeButton = new JButton("Sắp xếp thời gian");
+        JButton chartButton = new JButton("Biểu đồ");
+        JButton exportPdfButton = new JButton("PDF");
         JButton refreshButton = new JButton("Làm mới");
         
         addButton.addActionListener(e -> addPatient());
@@ -140,6 +151,8 @@ public class PatientPanel extends JPanel {
         clearButton.addActionListener(e -> clearInputFields());
         searchByDiseaseTypeButton.addActionListener(e -> searchByDiseaseType());
         sortByTimeButton.addActionListener(e -> sortByTime());
+        chartButton.addActionListener(e -> showChart());
+        exportPdfButton.addActionListener(e -> generatePdfReport());
         refreshButton.addActionListener(e -> loadTableData());
 
         JPanel inputPanel = new JPanel(new GridBagLayout());
@@ -194,57 +207,29 @@ public class PatientPanel extends JPanel {
         buttonPanel.add(clearButton);
         buttonPanel.add(searchByDiseaseTypeButton);
         buttonPanel.add(sortByTimeButton);
+        buttonPanel.add(chartButton);  
+        buttonPanel.add(exportPdfButton);
         buttonPanel.add(refreshButton);
         inputPanel.add(buttonPanel, gbc);
 
         return inputPanel;
     }
+
+    private void generatePdfReport() {
+        try {
+            String reportTemplate = "src/main/resources/reports/patient_report.jasper";
+            String outputPdfPath = "output/patient_report.pdf";
+            
+            // Gọi phương thức generateReport để tạo PDF
+            ReportGenerator.generateReport("src/main/resources/patients-data.json", reportTemplate, outputPdfPath);
+            
+            // Hiển thị thông báo
+            JOptionPane.showMessageDialog(this, "Đang trong quá trình phát triển!");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     
-    // Phương thức không tham số, sẽ gọi phương thức có tham số với `null`
-    private void updateClinicRoomComboBox() {
-        updateClinicRoomComboBox(null);
-    }
-    
-    // Phương thức có tham số để bỏ qua phòng cụ thể khi cần thiết
-    private void updateClinicRoomComboBox(Integer ignoreRoom) {
-        clinicRoomComboBox.removeAllItems();
-        for (int i = 1; i <= 10; i++) {
-            if (!usedRooms.contains(i) || (ignoreRoom != null && ignoreRoom == i)) {
-                clinicRoomComboBox.addItem(i);
-            }
-        }
-    }
-
-    private void loadTableData() {
-        tableModel.setRowCount(0);
-        for (Patient patient : patientManager.getPatients()) {
-            tableModel.addRow(new Object[]{
-                    patient.getId(),
-                    patient.getName(),
-                    patient.getPhone(),
-                    patient.getDoctor(),
-                    patient.getDiseaseType(),
-                    patient.getClinicRoom(),
-                    patient.getTime()
-            });
-        }
-    }
-
-    private void loadUserDataTable() {
-        userDataTableModel.setRowCount(0);
-        List<User> users = userManager.getUsers();
-        for (User user : users) {
-            userDataTableModel.addRow(new Object[]{
-                user.getName(),
-                user.getAge(),
-                user.getAddress(),
-                user.getPhone(),
-                user.getDiseaseType(),
-                user.getAppointmentTime()
-            });
-        }
-    }
-
     private void addPatient() {
         // Mã hiện tại  
         String name = nameField.getText();  
@@ -329,14 +314,6 @@ public class PatientPanel extends JPanel {
         }  
     }
     
-    private void reassignIds() {  
-        List<Patient> patients = patientManager.getPatients();  
-        for (int i = 0; i < patients.size(); i++) {  
-            Patient patient = patients.get(i);  
-            patient.setId(String.valueOf(i + 1)); // Gán lại ID bắt đầu từ 1  
-        }  
-    }  
-    
     private void clearInputFields() {
         nameField.setText("");
         phoneField.setText("");
@@ -378,9 +355,96 @@ public class PatientPanel extends JPanel {
                 .collect(Collectors.toList());
 
         patientManager.setPatients(sortedPatients); // Cập nhật danh sách bệnh nhân trong patientManager
+        reassignIds();
         loadTableData(); // Làm mới dữ liệu bảng
     }
+    
+    private void showChart() {
+        // Tính toán số lần xuất hiện của từng loại bệnh
+        Map<String, Long> diseaseCount = patientManager.getPatients().stream()
+                .collect(Collectors.groupingBy(Patient::getDiseaseType, Collectors.counting()));
 
+        // Chuyển đổi dữ liệu thành dataset cho JFreeChart
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+        diseaseCount.forEach((disease, count) -> {
+            dataset.addValue(count, "Số bệnh nhân", disease);
+        });
+
+        // Tạo biểu đồ cột
+        JFreeChart chart = ChartFactory.createBarChart(
+                "Số lượng bệnh nhân theo loại bệnh", // Title
+                "Loại bệnh",                        // X-Axis Label
+                "Số lượng",                         // Y-Axis Label
+                dataset,                            // Dataset
+                PlotOrientation.VERTICAL,           // Orientation
+                false,                              // Include legend
+                true,                               // Tooltips
+                false                               // URLs
+        );
+
+        // Hiển thị biểu đồ trong một cửa sổ
+        ChartPanel chartPanel = new ChartPanel(chart);
+        chartPanel.setPreferredSize(new java.awt.Dimension(800, 600));
+        JFrame chartFrame = new JFrame("Biểu đồ thống kê bệnh nhân");
+        chartFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        chartFrame.getContentPane().add(chartPanel);
+        chartFrame.pack();
+        chartFrame.setVisible(true);
+    }
+    
+    private void reassignIds() {  
+        List<Patient> patients = patientManager.getPatients();  
+        for (int i = 0; i < patients.size(); i++) {  
+            Patient patient = patients.get(i);  
+            patient.setId(String.valueOf(i + 1)); // Gán lại ID bắt đầu từ 1  
+        }  
+    }  
+    
+    private void loadTableData() {
+        tableModel.setRowCount(0);
+        for (Patient patient : patientManager.getPatients()) {
+            tableModel.addRow(new Object[]{
+                    patient.getId(),
+                    patient.getName(),
+                    patient.getPhone(),
+                    patient.getDoctor(),
+                    patient.getDiseaseType(),
+                    patient.getClinicRoom(),
+                    patient.getTime()
+            });
+        }
+    }
+
+    private void loadUserDataTable() {
+        userDataTableModel.setRowCount(0);
+        List<User> users = userManager.getUsers();
+        for (User user : users) {
+            userDataTableModel.addRow(new Object[]{
+                user.getName(),
+                user.getAge(),
+                user.getAddress(),
+                user.getPhone(),
+                user.getDiseaseType(),
+                user.getAppointmentTime()
+            });
+        }
+    }
+    
+    // Phương thức không tham số, sẽ gọi phương thức có tham số với `null`
+    private void updateClinicRoomComboBox() {
+        updateClinicRoomComboBox(null);
+    }
+    
+    // Phương thức có tham số để bỏ qua phòng cụ thể khi cần thiết
+    private void updateClinicRoomComboBox(Integer ignoreRoom) {
+        clinicRoomComboBox.removeAllItems();
+        for (int i = 1; i <= 10; i++) {
+            if (!usedRooms.contains(i) || (ignoreRoom != null && ignoreRoom == i)) {
+                clinicRoomComboBox.addItem(i);
+            }
+        }
+    }
+    
     private void exitToMainPanel() {
         mainFrame.showMainPanel();
     }

@@ -15,5 +15,6 @@ qlpk\app\App.class
 qlpk\entity\RoomManager.class
 qlpk\entity\User.class
 qlpk\view\UserPanel.class
+qlpk\report\ReportGenerator.class
 qlpk\view\DoctorPanel.class
 qlpk\entity\UserManager.class
