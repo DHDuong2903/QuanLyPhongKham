@@ -1,18 +1,18 @@
 package qlpk.entity;  
 
 public class Room { 
+    // Thuộc tính
     private String id;
     private String roomNumber;  
     private String status;
 
-    // Constructor  
+    // Phương thức  
     public Room(String id, String roomNumber, String status) {  
         this.id = id;
         this.roomNumber = roomNumber;  
         this.status = status;
     }  
-
-    // Getters and Setters  
+  
     public String getId() { return id; }
     public String getRoomNumber() { return roomNumber; }  
     public String getStatus() { return status; }  

@@ -2,12 +2,13 @@
 package qlpk.entity;  
 
 public class Doctor {  
+    // Thuộc tính
     private String id;  
     private String name;  
     private int age;  
     private String specialty; 
 
-    // Constructor  
+    // Phương thức 
     public Doctor(String id, String name, int age,String specialty) {  
         this.id = id;  
         this.name = name;  
@@ -15,7 +16,6 @@ public class Doctor {
         this.specialty = specialty;  
     }  
 
-    // Getters and Setters  
     public String getId() { return id; }  
     public String getName() { return name; }  
     public int getAge() { return age; }   

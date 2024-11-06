@@ -7,6 +7,7 @@ import java.io.*;
 import java.lang.reflect.Type;  
 import java.util.ArrayList;  
 import java.util.List;  
+import java.util.Set;
 
 public class RoomManager {  
     private List<Room> rooms;  
@@ -37,6 +38,17 @@ public class RoomManager {
             e.printStackTrace();  
         }  
     }  
+    
+    public void updateRoomStatuses(Set<Integer> bookedRooms) {
+        for (Room room : rooms) {
+            if (bookedRooms.contains(Integer.parseInt(room.getRoomNumber()))) {
+                room.setStatus("Đã đặt");
+            } else {
+                room.setStatus("Còn trống");
+            }
+        }
+        saveRooms();
+    }
 
     public void addRoom(Room room) {  
         rooms.add(room);  

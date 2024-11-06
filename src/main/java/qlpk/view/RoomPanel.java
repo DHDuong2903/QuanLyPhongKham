@@ -1,22 +1,25 @@
 package qlpk.view;
 
-import qlpk.app.Main;
+import qlpk.app.App;
 import qlpk.entity.Room;
 import qlpk.entity.RoomManager;
+import qlpk.entity.PatientManager;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class RoomPanel extends JPanel {
     private RoomManager roomManager;
     private DefaultTableModel tableModel;
     private JTable table;
     private JTextField roomNumberField, statusField;
-    private Main mainFrame;
+    private App mainFrame;
 
-    public RoomPanel(Main mainFrame) {
+    public RoomPanel(App mainFrame) {
         this.mainFrame = mainFrame;
         roomManager = new RoomManager();
         setLayout(new BorderLayout());
@@ -26,7 +29,7 @@ public class RoomPanel extends JPanel {
         JPanel topLeftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JButton exitButton = new JButton("Thoát");
 
-        exitButton.addActionListener(e -> exitToWelcomeScreen());
+        exitButton.addActionListener(e -> exitToMainPanel());
 
         topLeftPanel.add(exitButton);
         topPanel.add(topLeftPanel, BorderLayout.WEST);
@@ -91,16 +94,11 @@ public class RoomPanel extends JPanel {
         add(inputPanel, BorderLayout.WEST);
     }
 
-    private void exitToWelcomeScreen() {
-        // Đóng giao diện hiện tại
-        mainFrame.dispose();
-
-        // Mở lại màn hình chào mừng
-        WelcomeScreen welcomeScreen = new WelcomeScreen(mainFrame);
-        welcomeScreen.setVisible(true);
-    }
-
     private void loadTableData() {
+        // Cập nhật trạng thái phòng dựa trên danh sách phòng đã được đặt từ PatientManager
+        Set<Integer> bookedRooms = new HashSet<>(new PatientManager().getBookedRooms());
+        roomManager.updateRoomStatuses(bookedRooms);
+
         tableModel.setRowCount(0);
         for (Room room : roomManager.getRooms()) {
             tableModel.addRow(new Object[]{
@@ -109,6 +107,7 @@ public class RoomPanel extends JPanel {
             });
         }
     }
+
 
     private void addRoom() {
         String roomNumber = roomNumberField.getText();
@@ -194,5 +193,9 @@ public class RoomPanel extends JPanel {
                 });
             }
         }
+    }
+    
+    private void exitToMainPanel() {
+        mainFrame.showMainPanel();
     }
 }

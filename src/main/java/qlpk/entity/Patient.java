@@ -1,7 +1,8 @@
 
 package qlpk.entity;  
 
-public class Patient {  
+public class Patient { 
+    // Thuộc tính
     private String id;  
     private String name;  
     private String phone;  
@@ -9,8 +10,8 @@ public class Patient {
     private String diseaseType;
     private String clinicRoom;  
     private String time;  
-
-    // Constructor  
+    
+    // Phương thức
     public Patient(String id, String name, String phone, String doctor,String diseaseType, String clinicRoom, String time) {  
         this.id = id;  
         this.name = name;  
@@ -20,8 +21,7 @@ public class Patient {
         this.clinicRoom = clinicRoom;  
         this.time = time;  
     }  
-
-    // Getters and Setters  
+  
     public String getId() { return id; }  
     public String getName() { return name; }  
     public String getPhone() { return phone; }  
