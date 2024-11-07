@@ -58,33 +58,30 @@ public class PatientPanel extends JPanel {
         JPanel topPanel = createTopPanel();
         add(topPanel, BorderLayout.NORTH);
 
-        // Create patient data table
+        // Tạo table patient
         tableModel = new DefaultTableModel(new String[]{"ID", "Name", "Phone", "Doctor", "Disease Type", "Clinic Room", "Time"}, 0);
         table = new JTable(tableModel);
         loadTableData();
 
-        // Create user data table
+        // Tạo table user
         userDataTableModel = new DefaultTableModel(new String[]{"Name", "Age", "Address", "Phone", "Disease Type", "Appointment Time"}, 0);
         userDataTable = new JTable(userDataTableModel);
         loadUserDataTable();
 
-        // Create panel to contain both tables
+        // Tạo panel chứa 2 table
         JPanel tablePanel = new JPanel(new BorderLayout());
         tablePanel.add(new JScrollPane(table), BorderLayout.NORTH);
 
-        // Add title and table for "Danh sách đăng ký khám"
+        // Thêm title "Danh sách đăng ký khám"
         JPanel userTablePanel = new JPanel(new BorderLayout());
 
-        // Title label
         JLabel userTableTitle = new JLabel("Danh sách đăng ký khám", JLabel.CENTER);
         userTableTitle.setFont(new Font("Arial", Font.BOLD, 16));
         userTablePanel.add(userTableTitle, BorderLayout.NORTH);
 
-        // Ensure the userDataTable appears below the title
         JScrollPane userTableScrollPane = new JScrollPane(userDataTable);
         userTablePanel.add(userTableScrollPane, BorderLayout.CENTER);
         
-        // Initialize delete button for the lower table
         deleteButtonLowerTable = new JButton("Xóa (Danh sách đăng ký khám)");
         deleteButtonLowerTable.addActionListener(e -> {
             int selectedRow = userDataTable.getSelectedRow();
@@ -95,10 +92,10 @@ public class PatientPanel extends JPanel {
             }
         });
         
-        // Add the delete button to the bottom of the userTablePanel
+        // Thêm nút xóa cho userTablePanel
         userTablePanel.add(deleteButtonLowerTable, BorderLayout.SOUTH);
         
-        // Add userTablePanel to tablePanel
+        // Thêm userTablePanel vào tablePanel
         tablePanel.add(userTablePanel, BorderLayout.CENTER);
         add(tablePanel, BorderLayout.CENTER);
 
@@ -215,21 +212,6 @@ public class PatientPanel extends JPanel {
         return inputPanel;
     }
 
-    private void generatePdfReport() {
-        try {
-            String reportTemplate = "src/main/resources/reports/patient_report.jasper";
-            String outputPdfPath = "output/patient_report.pdf";
-            
-            // Gọi phương thức generateReport để tạo PDF
-            ReportGenerator.generateReport("src/main/resources/patients-data.json", reportTemplate, outputPdfPath);
-            
-            // Hiển thị thông báo
-            JOptionPane.showMessageDialog(this, "Đang trong quá trình phát triển!");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    
     private void addPatient() {
         // Mã hiện tại  
         String name = nameField.getText();  
@@ -442,6 +424,21 @@ public class PatientPanel extends JPanel {
             if (!usedRooms.contains(i) || (ignoreRoom != null && ignoreRoom == i)) {
                 clinicRoomComboBox.addItem(i);
             }
+        }
+    }
+    
+    private void generatePdfReport() {
+        try {
+            String reportTemplate = "src/main/resources/reports/patient_report.jasper";
+            String outputPdfPath = "output/patient_report.pdf";
+            
+            // Gọi phương thức generateReport để tạo PDF
+            ReportGenerator.generateReport("src/main/resources/patients-data.json", reportTemplate, outputPdfPath);
+            
+            // Hiển thị thông báo
+            JOptionPane.showMessageDialog(this, "Đang trong quá trình phát triển!");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
     

@@ -2,14 +2,14 @@ package qlpk.view;
 
 import qlpk.entity.User;
 import qlpk.entity.UserManager;
-// Các import khác
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
 import javax.swing.BorderFactory;
-import com.toedter.calendar.JDateChooser; // This is for the JDateChooser if you're using an external library for date selection
+import com.toedter.calendar.JDateChooser; 
 
 
 public class UserPanel extends JPanel {
