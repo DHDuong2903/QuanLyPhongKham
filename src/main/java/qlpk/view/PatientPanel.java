@@ -436,7 +436,7 @@ public class PatientPanel extends JPanel {
             ReportGenerator.generateReport("src/main/resources/patients-data.json", reportTemplate, outputPdfPath);
             
             // Hiển thị thông báo
-            JOptionPane.showMessageDialog(this, "Đang trong quá trình phát triển!");
+            JOptionPane.showMessageDialog(this, "Đã tạo thành công!");
         } catch (Exception e) {
             e.printStackTrace();
         }
